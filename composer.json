@@ -1,0 +1,36 @@
+{
+    "name": "dipokhalder/settings",
+    "description": "laravel setting",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dipokhalder\\Settings\\": "src/"
+        },
+        "files": [
+            "src/Support/settings.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Dipok Halder"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "illuminate/database": "^12.0.0",
+        "illuminate/support": "^12.0.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dipokhalder\\Settings\\SettingsServiceProvider"
+            ],
+            "aliases": {
+                "Settings": "Dipokhalder\\Settings\\Facades\\Settings"
+            }
+        }
+    }
+}
