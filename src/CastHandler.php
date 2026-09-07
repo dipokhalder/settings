@@ -53,7 +53,7 @@ class CastHandler
         if (is_object($cast->handler) && $cast->handler instanceof Castable) {
             return [
                 '$value' => ($cast->handler)->set($payload),
-                '$cast' => get_class($payload),
+                '$cast' => $cast->type,
             ];
         }
 

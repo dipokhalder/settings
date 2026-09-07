@@ -2,7 +2,7 @@
 
 namespace Dipokhalder\Settings;
 
-use Settings;
+use Dipokhalder\Settings\Facades\Settings;
 use Dipokhalder\Settings\Settings as SettingsManager;
 
 trait HasSettings

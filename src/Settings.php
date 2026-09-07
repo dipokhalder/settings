@@ -42,7 +42,7 @@ class Settings
      */
     public function set(string|array $key, mixed $value = null): void
     {
-        $this->forgetCacheIfEnabled($key);
+        $this->invalidateCacheIfEnabled();
 
         $this->repository
             ->withFilter($this->filter)
@@ -71,7 +71,7 @@ class Settings
      */
     public function forget(string|array $key): void
     {
-        $this->forgetCacheIfEnabled($key);
+        $this->invalidateCacheIfEnabled();
 
         $this->repository
             ->withFilter($this->filter)
@@ -146,11 +146,38 @@ class Settings
 
         $group = $this->filter->getGroup();
 
-        $for = $this->filter->getModel() ? get_class($this->filter->getModel()) : null;
-
         $excepts = implode(',', $this->filter->getExcepts());
 
-        return "{$prefix}settings.keys={$keys}&group={$group}&excepts={$excepts}&for={$for}";
+        return "{$prefix}settings.v{$this->generation()}"
+            ."&keys={$keys}&group={$group}&excepts={$excepts}&for={$this->resolveOwner()}";
+    }
+
+    /**
+     * Resolve the owner identity of the current settings scope.
+     */
+    protected function resolveOwner(): ?string
+    {
+        $model = $this->filter->getModel();
+
+        return $model ? get_class($model).':'.$model->getKey() : null;
+    }
+
+    /**
+     * Resolve the caching key of the current scope generation.
+     */
+    protected function resolveGenerationKey(): string
+    {
+        $prefix = config('settings.cache.prefix');
+
+        return "{$prefix}settings.generation&group={$this->filter->getGroup()}&for={$this->resolveOwner()}";
+    }
+
+    /**
+     * Retrieve the current scope generation.
+     */
+    protected function generation(): int
+    {
+        return (int) $this->cache->get($this->resolveGenerationKey(), 1);
     }
 
     /**
@@ -186,16 +213,12 @@ class Settings
     }
 
     /**
-     * Clear the given caching key values.
+     * Invalidate every cached entry of the current settings scope.
      */
-    protected function forgetCacheIfEnabled(string|array $key): void
+    protected function invalidateCacheIfEnabled(): void
     {
         if (config('settings.cache.enabled')) {
-            $cacheKey = $this->resolveCacheKey(is_array($key) ? array_keys($key) : $key);
-
-            if ($this->cache->has($cacheKey)) {
-                $this->cache->forget($cacheKey);
-            }
+            $this->cache->forever($this->resolveGenerationKey(), $this->generation() + 1);
         }
     }
 

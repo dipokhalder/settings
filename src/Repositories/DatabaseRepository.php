@@ -31,7 +31,7 @@ class DatabaseRepository extends Repository
      */
     public function __construct()
     {
-        $this->connection = config('database.connection');
+        $this->connection = config('settings.repositories.database.connection');
 
         $this->table = config('settings.repositories.database.table');
 
@@ -169,11 +169,10 @@ class DatabaseRepository extends Repository
                 'group' => $this->entryFilter->getGroup(),
                 'settingable_type' => $this->entryFilter->getModel() ? $this->determineModelMorphMapName() : null,
                 'settingable_id' => $this->entryFilter->getModel() ? $this->entryFilter->getModel()->getKey() : null,
-            ], [
+            ], fn (bool $exists) => array_merge([
                 'payload' => json_encode($this->castHandler->handle($value)),
-                'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ], $exists ? [] : ['created_at' => now()]));
     }
 
     /**

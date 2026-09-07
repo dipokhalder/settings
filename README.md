@@ -150,11 +150,11 @@ Settings::for($model)->group('name')->forget('key');
 You can determine whether the given settings entry key exists or not
 
 ```php
-Settings::exist('key');
+Settings::exists('key');
 
-Settings::for($model)->exist('key');
+Settings::for($model)->exists('key');
 
-Settings::for($model)->group('name')->exist('key');
+Settings::for($model)->group('name')->exists('key');
 ```
 
 ### Helper Method
